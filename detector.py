@@ -1,19 +1,5 @@
 import cv2
-
-try:
-    import mediapipe as mp
-except ImportError as e:
-    cause = e.__cause__
-    message = str(e).lower()
-    cause_message = str(cause).lower() if cause else ""
-    if "_array_api" in message or "numpy.core.multiarray failed to import" in message or "_array_api" in cause_message:
-        raise ImportError(
-            "mediapipe/matplotlib are incompatible with NumPy 2.x. "
-            "Install NumPy 1.x with `pip install 'numpy<2'` and retry."
-        ) from e
-    raise ImportError(
-        "mediapipe is required but failed to import. Install dependencies with `pip install -r requirements.txt`."
-    ) from e
+import mediapipe as mp
 
 class HandDetector:
     def __init__(self, max_hands=1, detection_confidence=0.7, tracking_confidence=0.7):
