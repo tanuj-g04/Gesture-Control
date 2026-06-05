@@ -17,6 +17,8 @@ detector = HandDetector()
 bri_con = BrightnessController()
 mouse = MouseController()
 prev_distance=0
+prev_x = None
+click_cooldown = 0
 threshold=5
 
 while True:
@@ -32,29 +34,49 @@ while True:
         if landmarks:
             gesture = GestureDetector(landmarks)
             fingers=gesture.fingers_up()
-            if fingers==[1,1,0,0,0]:
-                distance = gesture.distance(4, 8)
-                if distance > prev_distance + threshold:
-                    vol_con.change_volume("up")
-                elif distance < prev_distance - threshold:
-                    vol_con.change_volume("down")
-                prev_distance=distance
+
+            #if fingers==[1,1,0,0,0]:
+             #   distance = gesture.distance(4, 8)
+              #  if distance > prev_distance + threshold:
+               #     vol_con.change_volume("up")
+                #elif distance < prev_distance - threshold:
+                 #   vol_con.change_volume("down")
+                #prev_distance=distance
+            
             if fingers==[0,1,1,0,0]:
-                distance = gesture.distance(8,12)
-                if distance > prev_distance + threshold:
-                    bri_con.change_brightness("up")
-                elif distance < prev_distance - threshold:
-                    bri_con.change_brightness("down")
-                prev_distance=distance
+                curr_x = landmarks[8][1]
+                if prev_x is not None:
+                    if curr_x > prev_x + threshold:
+                        vol_con.change_volume("up")
+                    elif curr_x < prev_x - threshold:
+                        vol_con.change_volume("down")
+                prev_x = curr_x
+                
+            #if fingers==[0,1,1,0,0]:
+              #  distance = gesture.distance(8,12)
+               # if distance > prev_distance + threshold:
+                #    bri_con.change_brightness("up")
+                #elif distance < prev_distance - threshold:
+                 #   bri_con.change_brightness("down")
+                #prev_distance=distance
+
             if fingers == [0,1,0,0,0]:
                 x,y = landmarks[8][1], landmarks[8][2]
-                print("moving to:", x, y)
                 mouse.move(x, y, frame_w, frame_h)
-                print("moved")
+
+            if fingers == [1,1,0,0,0]:
+                pinch_dist = gesture.distance(4,8)
+                if pinch_dist < 30 and click_cooldown==0:
+                    mouse.click()
+                    click_cooldown = 10
+                if click_cooldown > 0:
+                    click_cooldown -= 1            
+
         cv2.imshow("Gesture Control", frame)
         if cv2.waitKey(10) & 0xFF == ord('q'):
             print("break: q pressed")
             break
+
     except Exception as e:
         import traceback
         traceback.print_exc()

@@ -48,3 +48,6 @@ class MouseController:
         curr_y = self.prev_y + (screen_y - self.prev_y) / self.smoothing
         pyautogui.moveTo(curr_x, curr_y)
         self.prev_x, self.prev_y = curr_x, curr_y
+    
+    def click(self):
+        pyautogui.click()
